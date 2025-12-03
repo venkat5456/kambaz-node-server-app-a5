@@ -1,48 +1,48 @@
+const AssignmentModel = require("./model.js");
 const { v4: uuidv4 } = require("uuid");
-const db = require("../Database/index.js");
 
-// Reference to assignments array
-let assignments = db.assignments;
+module.exports = function AssignmentsDao() {
+  
+  // FIND all or by course
+  const findAssignments = async (courseId) => {
+    if (courseId) {
+      return AssignmentModel.find({ course: courseId });
+    }
+    return AssignmentModel.find();
+  };
 
-// GET all or by course
-const findAssignments = (courseId) => {
-  if (courseId) {
-    return assignments.filter((a) => a.course === courseId);
-  }
-  return assignments;
-};
+  // FIND one by ID
+  const findAssignmentById = async (aid) => {
+    return AssignmentModel.findById(aid);
+  };
 
-// GET one by ID
-const findAssignmentById = (aid) =>
-  assignments.find((a) => a._id === aid);
+  // CREATE (attach uuid + course)
+  const createAssignment = async (assignment) => {
+    const newAssignment = {
+      _id: uuidv4(),
+      ...assignment,
+    };
+    return AssignmentModel.create(newAssignment);
+  };
 
-// CREATE
-const createAssignment = (assignment) => {
-  const newAssignment = { _id: uuidv4(), ...assignment };
-  assignments.push(newAssignment);
-  return newAssignment;
-};
+  // UPDATE
+  const updateAssignment = async (aid, updatedFields) => {
+    return AssignmentModel.updateOne(
+      { _id: aid },
+      { $set: updatedFields }
+    );
+  };
 
-// UPDATE
-const updateAssignment = (aid, updatedFields) => {
-  const index = assignments.findIndex((a) => a._id === aid);
-  if (index === -1) return null;
-  assignments[index] = { ...assignments[index], ...updatedFields };
-  return assignments[index];
-};
+  // DELETE
+  const deleteAssignment = async (aid) => {
+    return AssignmentModel.deleteOne({ _id: aid });
+  };
 
-// DELETE
-const deleteAssignment = (aid) => {
-  const index = assignments.findIndex((a) => a._id === aid);
-  if (index === -1) return false;
-  assignments.splice(index, 1);
-  return true;
-};
-
-module.exports = {
-  findAssignments,
-  findAssignmentById,
-  createAssignment,
-  updateAssignment,
-  deleteAssignment,
+  return {
+    findAssignments,
+    findAssignmentById,
+    createAssignment,
+    updateAssignment,
+    deleteAssignment,
+  };
 };

@@ -3,31 +3,43 @@ const EnrollmentsDao = require("./dao.js");
 module.exports = (app, db) => {
   const dao = EnrollmentsDao(db);
 
-  // GET enrollments (optionally by user or course)
-  app.get("/api/enrollments", (req, res) => {
+  // ⭐ GET enrollments (raw list of enrollment documents)
+  app.get("/api/enrollments", async (req, res) => {
     const { user, course } = req.query;
-    const results = dao.findEnrollments(user, course);
-    res.json(results);
+
+    try {
+      const results = await dao.findEnrollments(user, course);
+      res.json(results);
+    } catch (err) {
+      console.error("Error in GET /api/enrollments", err);
+      res.status(500).json({ message: "Error retrieving enrollments" });
+    }
   });
 
-  // POST enroll
-  app.post("/api/enrollments", (req, res) => {
+  // ⭐ ENROLL a user into a course
+  app.post("/api/enrollments", async (req, res) => {
     const { user, course } = req.body;
-    const result = dao.enrollUserInCourse(user, course);
 
-    if (!result) {
-      return res.status(409).json({ message: "Already enrolled" });
+    try {
+      const enrollment = await dao.enrollUserInCourse(user, course);
+      res.json(enrollment);
+    } catch (err) {
+      res.status(409).json({
+        message: "Already enrolled or error creating enrollment",
+      });
     }
-
-    res.json(result);
   });
 
-  // DELETE unenroll
-  app.delete("/api/enrollments/:eid", (req, res) => {
-    const deleted = dao.unenrollUser(req.params.eid);
-    if (!deleted) {
-      return res.status(404).json({ message: "Enrollment not found" });
+  // ⭐ UNENROLL using user + course (MongoDB)
+  app.delete("/api/enrollments", async (req, res) => {
+    const { user, course } = req.body;
+
+    try {
+      await dao.unenrollUserFromCourse(user, course);
+      res.sendStatus(200);
+    } catch (err) {
+      console.error("Error in DELETE /api/enrollments", err);
+      res.status(500).json({ message: "Error unenrolling user" });
     }
-    res.sendStatus(200);
   });
 };

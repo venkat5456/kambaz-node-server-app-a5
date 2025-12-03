@@ -19,4 +19,15 @@ module.exports = [
     dob: "2000-02-02",
     role: "FACULTY",  // ⭐ Can add/edit/delete courses/modules
   },
+
+  {
+    _id: "3",
+    username: "Jame",
+    password: "hudson",
+    firstname: "huds",
+    lastName: "CS1234.03",
+    email: "Admin",
+    dob: "2003-02-02",
+    role: "ADMIN",
+  },
 ];

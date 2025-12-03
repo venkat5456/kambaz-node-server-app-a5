@@ -2,25 +2,37 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const session = require("express-session");
+const mongoose = require("mongoose");
 
 const Hello = require("./Hello.js");
 const Lab5 = require("./Lab5/index.js");
 
-const db = require("./Kambaz/Database/index.js");
+// Load Kambaz Database (index.ts / index.js)
+const db = require("./Kambaz/Database");
 
-// ⭐ Import your Kambaz feature routes
+// Kambaz feature routes
 const UserRoutes = require("./Kambaz/Users/routes.js");
 const CourseRoutes = require("./Kambaz/Courses/routes.js");
 const ModulesRoutes = require("./Kambaz/Modules/routes.js");
 const AssignmentsRoutes = require("./Kambaz/Assignments/routes.js");
 const EnrollmentsRoutes = require("./Kambaz/Enrollments/routes.js");
 
+// Mongoose Connection
+const CONNECTION_STRING =
+  process.env.DATABASE_CONNECTION_STRING ||
+  "mongodb://127.0.0.1:27017/kambaz";
+
+mongoose
+  .connect(CONNECTION_STRING)
+  .then(() => console.log("Connected to MongoDB ✔️"))
+  .catch((err) => console.log("MongoDB Connection Error ❌", err));
+
 const app = express();
 
-// ⭐ CORS configuration (Frontend: Vercel + Localhost)
+// CORS configuration (Frontend: Vercel + Localhost)
 const allowedOrigins = [
   "http://localhost:3000",
-  "https://a3-kambaz.vercel.app"
+  "https://a3-kambaz.vercel.app",
 ];
 
 app.use(
@@ -45,21 +57,21 @@ app.use(
   })
 );
 
-// ⭐ Support JSON body parsing
+// JSON body parsing
 app.use(express.json());
 
-// ⭐ General API
+// General API
 Hello(app);
 Lab5(app);
 
-// ⭐ Register all Kambaz Routes
-UserRoutes(app, db);
+// Register all Kambaz Routes
+UserRoutes(app);         // Users routes don't use `db`
 CourseRoutes(app, db);
 ModulesRoutes(app, db);
 AssignmentsRoutes(app, db);
 EnrollmentsRoutes(app, db);
 
-// ⭐ Server Start
+// Server Start
 const port = process.env.PORT || 4000;
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
