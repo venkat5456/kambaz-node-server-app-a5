@@ -42,18 +42,31 @@ const app = express();
 // ⭐ REQUIRED FOR RENDER — enables secure cookies
 app.set("trust proxy", 1);
 
-// CORS
+/* -----------------------------
+        CORS (FULL FIX)
+ ------------------------------*/
+
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://kambaz-next-js-a6-sigma.vercel.app",
+];
+
 app.use(
   cors({
-    origin: [
-      "http://localhost:3000",
-      "https://kambaz-next-js-a6-sigma.vercel.app",
-    ],
+    origin: allowedOrigins,
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
-// Sessions
+// Preflight support for all routes
+app.options("*", cors());
+
+/* -----------------------------
+        Sessions 
+ ------------------------------*/
+
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "kambaz",
@@ -68,7 +81,10 @@ app.use(
   })
 );
 
-// JSON parsing
+/* -----------------------------
+        JSON Body Parsing
+ ------------------------------*/
+
 app.use(express.json());
 
 /* -----------------------------
