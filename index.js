@@ -60,8 +60,7 @@ app.use(
   })
 );
 
-// ⭐ FIX: Handle preflight (important for PUT/DELETE on Render)
-app.options("*", cors());
+
 
 
 /* -----------------------------
