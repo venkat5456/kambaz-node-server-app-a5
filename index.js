@@ -33,6 +33,7 @@ const app = express();
 const allowedOrigins = [
   "http://localhost:3000",
   "https://a3-kambaz.vercel.app",
+  "https://kambaz-next-js-a6-sigma.vercel.app"
 ];
 
 app.use(
