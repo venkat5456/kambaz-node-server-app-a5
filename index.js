@@ -17,22 +17,24 @@ const ModulesRoutes = require("./Kambaz/Modules/routes.js");
 const AssignmentsRoutes = require("./Kambaz/Assignments/routes.js");
 const EnrollmentsRoutes = require("./Kambaz/Enrollments/routes.js");
 
-// Mongoose Connection
-const CONNECTION_STRING =
-  process.env.DATABASE_CONNECTION_STRING ||
-  "mongodb://127.0.0.1:27017/kambaz";
+const CONNECTION_STRING = process.env.MONGO_URI;
+
+if (!CONNECTION_STRING) {
+  console.error("❌ ERROR: MONGO_URI is not set in Render environment variables");
+  process.exit(1);
+}
 
 mongoose
   .connect(CONNECTION_STRING)
-  .then(() => console.log("Connected to MongoDB ✔️"))
+  .then(() => console.log("MongoDB Connected 🚀"))
   .catch((err) => console.log("MongoDB Connection Error ❌", err));
+
 
 const app = express();
 
 // CORS configuration (Frontend: Vercel + Localhost)
 const allowedOrigins = [
   "http://localhost:3000",
-  "https://a3-kambaz.vercel.app",
   "https://kambaz-next-js-a6-sigma.vercel.app"
 ];
 
